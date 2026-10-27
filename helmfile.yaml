@@ -1,0 +1,33 @@
+repositories:
+  - name: strimzi
+    url: https://strimzi.io/charts/
+
+environments:
+  default: 
+    values:
+      - envFile: ./envs/test.yaml
+  local:
+    values:
+      - envFile: ./envs/test.yaml
+  azure: 
+    values:
+      - envFile: ./envs/azure.yaml
+releases:
+  - name: strimzi-operator
+    namespace: kafka
+    chart: strimzi/strimzi-kafka-operator
+    createNamespace: true
+    wait: true
+    timeout: 300
+
+  - name: kafka-chart
+    namespace: kafka
+    createNamespace: false
+    chart: ./kafka-cluster
+
+    needs:
+      - kafka/strimzi-operator
+
+    values:
+      - ./kafka-cluster/values.yaml
+      - {{ .Values.envFile }}

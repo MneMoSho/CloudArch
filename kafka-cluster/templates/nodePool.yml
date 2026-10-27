@@ -1,0 +1,31 @@
+{{- range .Values.nodePools }}
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    strimzi.io/cluster: {{ $.Values.clusterName }}
+spec:
+  replicas: {{ .replicas }}
+  roles:
+    {{- toYaml .roles | nindent 4 }}
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: {{ .diskSize }}
+        class: standard
+        deleteClaim: false
+  resources:
+    {{- toYaml .resources | nindent 4 }}
+  jvmOptions:
+    {{- toYaml .jvmOptions | nindent 4 }}
+  template:
+    pod:
+      {{- include "podeAntiAffinity" (dict "poolName" .name "clusterName" $.Values.clusterName) | nindent 6 }}
+      {{- include "topologySpreadConstraints" (dict "clusterName" $.Values.clusterName "poolName" .name) | nindent 6 }}
+
+{{- end }}

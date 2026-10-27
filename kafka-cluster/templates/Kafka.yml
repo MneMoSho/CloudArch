@@ -1,0 +1,21 @@
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: {{ .Values.clusterName }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    {{- toYaml .Values.annotations | nindent 4 }}
+spec:
+  kafka:
+    version: 4.0.0
+    metadataVersion: 4.0-IV3
+    listeners:
+      {{- toYaml .Values.spec.kafka.listeners | nindent 6 }}
+    authorization:
+      type: simple
+    rack:
+      topologyKey: topology.kubernetes.io/zone
+    {{- include "configRack" . | nindent 4 }}
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}

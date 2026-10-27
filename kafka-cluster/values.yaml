@@ -1,0 +1,54 @@
+namespace: kafka
+clusterName: my-cluster
+
+annotations:
+  strimzi.io/node-pools: enabled
+  strimzi.io/kraft: enabled
+
+spec:
+  kafka:
+    version: 4.0.0
+    listeners:
+    - name: plain
+      port: 9092
+      type: internal
+      tls: false
+    - name: tls
+      port: 9093
+      type: internal
+      tls: true
+      authentication:
+        type: scram-sha-512
+
+nodePools:
+  - name: "controller"
+    replicas: 3
+    diskSize: 10Gi
+    roles:
+      - controller
+    resources:
+      requests:
+        cpu: "1"
+        memory: 4Gi
+      limits:
+        cpu: "1"
+        memory: 4Gi
+    jvmOptions:
+      -Xms: 1g
+      -Xmx: 1g 
+
+  - name: "broker"
+    replicas: 3
+    diskSize: 10Gi
+    roles:
+      - broker
+    resources:
+      requests:
+        cpu: "500m"
+        memory: 2Gi
+      limits:
+        cpu: "1"
+        memory: 2Gi
+    jvmOptions:
+      -Xms: 1g
+      -Xmx: 1g

@@ -1,0 +1,34 @@
+nodePools:
+  - name: "controller"
+    replicas: 3
+    diskSize: 10Gi
+    storageClass: "standard"
+    roles:
+      - controller
+    resources:
+      requests:
+        cpu: "1"
+        memory: 4Gi
+      limits:
+        cpu: "1"
+        memory: 4Gi
+    jvmOptions:
+      -Xms: 1g
+      -Xmx: 1g 
+
+  - name: "broker"
+    replicas: 3
+    diskSize: 10Gi
+    storageClass: "standard"
+    roles:
+      - broker
+    resources:
+      requests:
+        cpu: "500m"
+        memory: 2Gi
+      limits:
+        cpu: "1"
+        memory: 2Gi
+    jvmOptions:
+      -Xms: 1g
+      -Xmx: 1g

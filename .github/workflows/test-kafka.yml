@@ -1,0 +1,58 @@
+name: Kafka
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Kafka_deploy/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CheckoutCode
+        uses: actions/checkout@v4
+
+      - name: setupCluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: "kind-kafka"
+          config: | 
+            kind: Cluster
+            apiVersion: kind.x-k8s.io/v1alpha4
+            nodes:
+              - role: control-plane
+              - role: worker
+                labels: 
+                  topology.kubernetes.io/zone: zone-1
+              - role: worker
+                labels: 
+                  topology.kubernetes.io/zone: zone-2
+              - role: worker
+                labels: 
+                  topology.kubernetes.io/zone: zone-3  
+      
+      - name: verify names of nodes
+        run: |
+          kubectl get nodes -o wide
+          kubectl get nodes --show-labels | grep topology.kubernetes.io/zone
+        
+      - name: setup helmfile
+        uses: mamezou-tech/setup-helmfile@v2.2.0
+
+      - name: setup chart
+        run: | 
+          helmfile --version
+          helm version
+          helmfile -e local apply
+
+      - name: wait for kafka ready
+        run: |
+          echo "waiting for turning on"
+          kubectl wait kafka/my-cluster -n kafka --for=condition=Ready --timeout=360s
+          kubectl get pods -n kafka -o wide

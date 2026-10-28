@@ -2,7 +2,7 @@
 nodePools:
   - name: "controller"
     replicas: 3
-    diskSize: 10Gi
+    diskSize: 100Gi
     storageClass: "managed-csi"
     roles:
       - controller

@@ -1,6 +1,8 @@
 repositories:
   - name: strimzi
     url: https://strimzi.io/charts/
+  - name: provectus
+    url: https://provectus.github.io/kafka-ui-charts
 
 environments:
   default: 
@@ -31,3 +33,17 @@ releases:
     values:
       - ./kafka-cluster/values.yaml
       - {{ .Values.envFile }}
+  - name: kafka-ui
+    namespace: kafka
+    values:
+      - envs:
+          config:
+            KAFKA_CLUSTERS_0_NAME: "my-cluster"
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "my-cluster-kafka-bootstrap:9092"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi

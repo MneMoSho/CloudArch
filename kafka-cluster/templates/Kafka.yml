@@ -16,6 +16,32 @@ spec:
     rack:
       topologyKey: topology.kubernetes.io/zone
     {{- include "configRack" . | nindent 4 }}
+
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: kafka-metrics
+          key: kafka-metrics-config.yml
+
+  kafkaExporter:
+    groupRegex: ".*"
+    topicRegex: ".*"
+    resources: 
+      requests:
+        cpu: 200m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
+  logging:
+    type: inline
+    loggers:
+      rootLogger.level: "INFO"
+      appender.console.layout.type: JsonLayout
+      appender.console.layout.compact: true
+      appender.console.layout.eventEol: true
+
   entityOperator:
     topicOperator: {}
     userOperator: {}

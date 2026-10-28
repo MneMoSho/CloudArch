@@ -11,6 +11,14 @@ spec:
   replicas: {{ .replicas }}
   roles:
     {{- toYaml .roles | nindent 4 }}
+
+    metricsConfig:
+    type: jmxPrometheusExporter
+    valueFrom:
+      configMapKeyRef:
+        name: kafka-metrics
+        key: kafka-metrics-config.yml
+
   storage:
     type: jbod
     volumes:
